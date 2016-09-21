@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="xar" name="sarit-data-new">
-    <property name="project.version" value="0.1"/>
+    <property name="project.version" value="0.2"/>
     <property name="project.app" value="sarit-data"/>
     <property name="build.dir" value="build"/>
     <property name="download.dir" value="download"/>
@@ -22,7 +22,7 @@
 
         <foreach target="zipfile" param="theFile" >
             <fileset dir="data" casesensitive="yes" >
-                <include name="**/*.xml" />
+                <include name="*.xml" />
             </fileset>
         </foreach>
 
@@ -30,7 +30,7 @@
     </target>
 
     <target name="zipfile">
-        <echo message="${theFile}"/>
+        <echo message="Zipping to ${theFile}"/>
         <basename property="theName" suffix=".xml" file="${theFile}"/>
         <zip  destfile="${download.dir}/${theName}.zip">
             <fileset file="${theFile}"/>

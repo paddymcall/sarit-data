@@ -22,7 +22,7 @@
 
         <foreach target="zipfile" param="theFile" >
             <fileset dir="data" casesensitive="yes" >
-                <include name="*.xml" />
+                <include name="ratnakirti-nibandhavali.xml" />
             </fileset>
         </foreach>
 

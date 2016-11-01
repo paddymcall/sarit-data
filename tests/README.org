@@ -1,0 +1,30 @@
+#+TITLE: Notes on the sarit-data/tests things
+
+
+* Setting up the database for testing
+
+#+BEGIN_SRC bash
+  #!env /bin/bash
+  EXISTDIR="/opt/lib/existdb-3.0rc1"
+  EXISTCOLLECTION="/db/soup"
+  # files to use, using relative paths
+  EXISTFILE="saritcorpus.xml"
+  EXISTCONFIG="../collection.xconf"
+  $EXISTDIR/bin/client.sh -u admin -P admin --no-gui --rmcol $EXISTCOLLECTION \
+      && \
+      $EXISTDIR/bin/client.sh -u admin -P admin --no-gui --mkcol $EXISTCOLLECTION \
+      && \
+      $EXISTDIR/bin/client.sh -u admin -P admin --no-gui --rmcol "/db/system/config/"$EXISTCOLLECTION \
+      && \
+      $EXISTDIR/bin/client.sh -u admin -P admin --no-gui --mkcol "/db/system/config/"$EXISTCOLLECTION \
+      && \
+      $EXISTDIR/bin/client.sh --collection "/db/system/config/"$EXISTCOLLECTION -u admin -P admin \
+                              --parse $EXISTCONFIG
+      && \
+      $EXISTDIR/bin/client.sh --collection $EXISTCOLLECTION -u admin -P admin \
+                              --parse $EXISTFILE && \
+
+      # on my laptop: parsed 104107439 bytes in 694576ms.
+    
+                            
+#+END_SRC

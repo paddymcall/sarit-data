@@ -126,6 +126,6 @@ declare %private function gh:clear-data() {
             xmldb:remove($config:data-root)
         else
             (),
-        xmldb:create-collection($config:app-root, "data")
+        xmldb:create-collection($config:app-root, $config:data-root)
     )[3]
 };

@@ -21,8 +21,8 @@
         <mkdir dir="${download.dir}"/>
 
         <foreach target="zipfile" param="theFile" >
-            <fileset dir="data" casesensitive="yes" >
-                <include name="*.xml" />
+            <fileset dir="curr-data" casesensitive="yes" >
+                <include name="saritcorpus.xml" />
             </fileset>
         </foreach>
 

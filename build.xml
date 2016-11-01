@@ -34,7 +34,8 @@
       <classpath refid="classpath.core"/>
     </typedef>
 
-    <target name="clean" xmlns:xmldb="http://exist-db.org/ant">
+
+    <target name="clean" xmlns:xmldb="http://exist-db.org/ant" depends="deconfigure">
       <xdb:remove xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
@@ -44,17 +45,38 @@
       
     </target>
 
-    <target name="configure" xmlns:xmldb="http://exist-db.org/ant">
+    <target name="config-file-present">
+      <description>Check if config file (${config.config}) exists.</description>
+      <available file="${config.config}" property="config-file.present"/>
+    </target>
+
+
+    <target name="configure"
+	    xmlns:xmldb="http://exist-db.org/ant"
+	    depends="config-file-present"
+	    if="config-file.present">
       <echo message="Storing config file: ${config.saritdata}/${config.config}"/>
       <xdb:store xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
-		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/system/config/sarit-data"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/system/config/db/sarit-data"
 		 createcollection="true"
-		 srcfile="${config.saritdata}/${config.config}"/>
+		 srcfile="${config.config}"/>
+    </target>
+
+    <target name="deconfigure" xmlns:xmldb="http://exist-db.org/ant">
+      <echo message="Removing config file: ${config.config}"/>
+      <xdb:remove xmlns:xdb="http://exist-db.org/ant"
+		 user="${config.username}"
+		 password="${config.password}"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/system/config/db/sarit-data"
+		 resource="collection.xconf"
+		 />
     </target>
     
-    <target name="store" xmlns:xmldb="http://exist-db.org/ant" depends="configure">
+    <target name="store"
+	    xmlns:xmldb="http://exist-db.org/ant"
+	    depends="configure">
       <echo message="Installing SARIT data"/>
       <echo message="Loading SARIT sources from directory: ${config.saritdata}"/>
       <echo message="Storing SARIT index from: ${config.saritdata}/${config.index}"/>

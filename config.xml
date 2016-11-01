@@ -2,8 +2,9 @@
 <!-- $Id$ -->
 <config>
   <username>admin</username>
-  <password>1234</password>
+  <password></password>
   <saritdata>data</saritdata>
+  <!-- where exist is installed -->
   <existdir>/opt/lib/existdb-3.0rc1</existdir>
   <index>saritcorpus.xml</index>
   <config>collection.xconf</config>

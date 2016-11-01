@@ -28,3 +28,66 @@
     
                             
 #+END_SRC
+
+
+* Some tests // experiments
+
+- these suggest you use https://github.com/pashky/restclient.el
+
+
+** see if rest api is alive
+
+ #+BEGIN_SRC restclient
+   GET http://localhost:8080/exist/rest/
+   User-Agent: Emacs Restclient
+ #+END_SRC
+
+
+** get a file 
+
+#+BEGIN_SRC restclient
+  GET http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml
+#+END_SRC
+
+
+** get the config
+
+#+BEGIN_SRC restclient
+  GET http://localhost:8080/exist/rest/db/system/config/db/sarit-data/collection.xconf
+#+END_SRC
+
+
+
+** simple search (not working, namespace issue?)
+
+#+BEGIN_SRC restclient
+  GET http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml?_query=//p
+#+END_SRC
+
+
+** full text query (standard index)
+
+#+BEGIN_SRC restclient
+  POST http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml
+  Content-Type: application/xml
+
+  <query xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
+  <text>//tei:p[ft:query(., "तत्र")]</text>
+  </query>
+#+END_SRC
+
+
+** full text query for slp1 index
+
+#+BEGIN_SRC restclient
+  POST http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml
+  Content-Type: application/xml
+
+  <query xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
+  <text>//tei:p[ft:query(., "tatra")]</text>
+  </query>
+#+END_SRC
+
+
+
+

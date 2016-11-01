@@ -1,40 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project default="xar" name="sarit-data-new">
-    <property name="project.version" value="0.2"/>
+<!-- see http://www.exist-db.org/exist/apps/doc/ant-tasks.xml -->
+<project default="store" name="sarit-data">
+
+  
+  <!-- use ant-contrib for foreach -->
+  <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+    <classpath>
+      <pathelement location="lib/ant-contrib-1.0b3.jar"/>
+    </classpath>
+  </taskdef>
+  
+    <property name="project.version" value="0.0.1"/>
     <property name="project.app" value="sarit-data"/>
     <property name="build.dir" value="build"/>
-    <property name="download.dir" value="download"/>
 
-    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
-        <classpath>
-            <pathelement location="lib/ant-contrib-1.0b3.jar"/>
-        </classpath>
-    </taskdef>
+    <!-- import default properties from file -->
+    <xmlproperty file="config.xml"/>
+    
+    <property name="server.dir" value="${config.existdir}"/>
 
-    <target name="clean">
-        <delete dir="${build.dir}" />
-        <delete dir="${download.dir}"/>
+    <loadfile property="sarit-find-files" srcFile="sarit-files.xq"/>
+    
+    <path id="classpath.core">
+      <fileset dir="${server.dir}/lib/core">
+        <include name="*.jar"/>
+      </fileset>
+      <pathelement path="${server.dir}/exist.jar"/>
+      <pathelement path="${server.dir}/exist-optional.jar"/>
+    </path>
+
+
+    <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+      <classpath refid="classpath.core"/>
+    </typedef>
+
+    <target name="clean" xmlns:xmldb="http://exist-db.org/ant">
+      <xdb:remove xmlns:xdb="http://exist-db.org/ant"
+		 user="${config.username}"
+		 password="${config.password}"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/sarit-data"
+		 collection="master"		 
+		 />
+      
     </target>
 
-    <target name="xar" depends="clean">
-        <mkdir dir="${build.dir}"/>
-        <mkdir dir="${download.dir}"/>
+    <target name="configure" xmlns:xmldb="http://exist-db.org/ant">
+      <echo message="Storing config file: ${config.saritdata}/${config.config}"/>
+      <xdb:store xmlns:xdb="http://exist-db.org/ant"
+		 user="${config.username}"
+		 password="${config.password}"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/system/config/sarit-data"
+		 createcollection="true"
+		 srcfile="${config.saritdata}/${config.config}"/>
+    </target>
+    
+    <target name="store" xmlns:xmldb="http://exist-db.org/ant" depends="configure">
+      <echo message="Installing SARIT data"/>
+      <echo message="Loading SARIT sources from directory: ${config.saritdata}"/>
+      <echo message="Storing SARIT index from: ${config.saritdata}/${config.index}"/>
+      <xdb:store xmlns:xdb="http://exist-db.org/ant"
+		 user="${config.username}"
+		 password="${config.password}"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/sarit-data/master"
+		 createcollection="true"
+		 srcfile="${config.saritdata}/${config.index}"/>
+      
+      <xdb:xquery xmlns:xdb="http://exist-db.org/ant"
+		 user="${config.username}"
+		 password="${config.password}"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/sarit-data/master"
+		 query="${sarit-find-files}"
+		 outputproperty="storeus"/>
+      
+      <echo message="Found this stuff to store: ${storeus}"/>
 
-        <foreach target="zipfile" param="theFile" >
-            <fileset dir="curr-data" casesensitive="yes" >
-                <include name="saritcorpus.xml" />
-            </fileset>
-        </foreach>
-
-        <zip basedir="." encoding="UTF-8" destfile="${build.dir}/${project.app}-${project.version}.xar" excludes="${build.dir}/*"/>
+      <foreach list="${storeus}" target="storefile" param="filename" >
+	
+      </foreach>
+      
     </target>
 
-    <target name="zipfile">
-        <echo message="Zipping to ${theFile}"/>
-        <basename property="theName" suffix=".xml" file="${theFile}"/>
-        <zip  destfile="${download.dir}/${theName}.zip">
-            <fileset file="${theFile}"/>
-        </zip>
+    <target name="storefile">
+      <!-- somehow, this is set? -->
+      <echo message="Storing this file: ${filename}"/>
+      <xdb:store xmlns:xdb="http://exist-db.org/ant"
+		 user="${config.username}"
+		 password="${config.password}"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/sarit-data/master"
+		 createcollection="true"
+		 srcfile="${config.saritdata}/${filename}"/>
     </target>
 
 </project>

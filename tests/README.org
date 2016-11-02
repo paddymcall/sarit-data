@@ -99,12 +99,30 @@
 
   <query xmlns="http://exist.sourceforge.net/NS/exist">
   <text>
-  let $query := <query xmlns="http://exist.sourceforge.net/NS/exist"><bool><wildcard occur="must">jalārth*</wildcard></bool></query>
-  //*[ft:query(., "tatra")]
+  xquery version "3.1";
+  declare namespace tei="http://www.tei-c.org/ns/1.0";
+  let $query := <query xmlns="http://exist.sourceforge.net/NS/exist"><bool><wildcard>tatra</wildcard></bool></query>
+  return count(//tei:p[ft:query(., $query)])
   </text>       
   </query>
 #+END_SRC
 
+
+***  this works in exide:
+
+#+BEGIN_SRC xquery
+xquery version "3.1";
+
+declare namespace tei="http://www.tei-c.org/ns/1.0";
+
+let  $query:=
+              <query xmlns="http://exist.sourceforge.net/NS/exist">
+<bool>
+    <wildcard>nirAkaro*</wildcard>
+    </bool>
+    </query>
+return count(//tei:p[ft:query(., $query)])
+#+END_SRC
 
 
 

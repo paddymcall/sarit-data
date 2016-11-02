@@ -91,3 +91,20 @@
 
 
 
+** full text wildcard query
+
+#+BEGIN_SRC restclient
+  POST http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml
+  Content-Type: application/xml
+
+  <query xmlns="http://exist.sourceforge.net/NS/exist">
+  <text>
+  let $query := <query xmlns="http://exist.sourceforge.net/NS/exist"><bool><wildcard occur="must">jalārth*</wildcard></bool></query>
+  //*[ft:query(., "tatra")]
+  </text>       
+  </query>
+#+END_SRC
+
+
+
+

@@ -88,10 +88,81 @@
   </query>
 #+END_SRC
 
+** full text wildcard query no query-object
+
+- see http://www.exist-db.org/exist/apps/doc/lucene.xml#D2.2.5
+
+#+BEGIN_SRC restclient
+  POST http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml
+  Content-Type: application/xml
+
+  <query xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
+  <text>//tei:p[ft:query(., "nam* AND lok*")]</text>
+  </query>
+#+END_SRC
+
+** full text leading wildcard query (no query-object) + options
+
+- see http://www.exist-db.org/exist/apps/doc/lucene.xml#D2.2.5, and
+- http://www.exist-db.org/exist/apps/doc/lucene.xml#D2.2.5.10 for options
+
+#+BEGIN_SRC restclient
+  POST http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml
+  Content-Type: application/xml
+
+  <query xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
+  <text>
+  <![CDATA[
+          
+                    xquery version "3.1";
+                    declare namespace tei="http://www.tei-c.org/ns/1.0";
+                    let $options := <options>
+                            <default-operator>and</default-operator>
+                            <phrase-slop>1</phrase-slop>
+                            <leading-wildcard>yes</leading-wildcard>
+                            <filter-rewrite>yes</filter-rewrite>
+              </options>            
+                    let $query := "*ntar* AND *tatr*"
+                    for $hit in //tei:p[ft:query(., $query, $options)]
+                    order by ft:score($hit)
+                    return $hit
+          
+    ]]>
+    </text>
+  </query>
+#+END_SRC
 
 
+** TODO full text wildcard + diacritics
 
-** full text wildcard query
+- no results here :-(
+
+#+BEGIN_SRC restclient
+  POST http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml
+  Content-Type: application/xml
+
+  <query xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
+  <text>
+  <![CDATA[
+          
+                    xquery version "3.1";
+                    declare namespace tei="http://www.tei-c.org/ns/1.0";
+                    let $query := "sTUlo"
+                    for $hit in //tei:p[ft:query(., $query)]
+                    order by ft:score($hit)
+                    return $hit
+          
+    ]]>
+    </text>
+  </query>
+
+#+END_SRC
+
+** full text wildcard query with query object
+
+- see http://www.exist-db.org/exist/apps/doc/lucene.xml#D2.2.5.9
+- if the "string version" works, there's no need for this object (it's
+  complicated because it requires that user input is parsed).
 
 #+BEGIN_SRC restclient
   POST http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml
@@ -110,21 +181,24 @@
 #+END_SRC
 
 
-***  this works in exide:
 
-#+BEGIN_SRC xquery
-  xquery version "3.1";
 
-  declare namespace tei="http://www.tei-c.org/ns/1.0";
+** boolean query
 
-  let  $query:=
-                <query xmlns="http://exist.sourceforge.net/NS/exist">
-  <bool>
-      <wildcard>nirAkaro*</wildcard>
-      </bool>
-      </query>
-  return count(//tei:p[ft:query(., $query)])
+#+BEGIN_SRC restclient
+  POST http://localhost:8080/exist/rest/sarit-data/master
+  Content-Type: application/xml
+
+  <query xmlns="http://exist.sourceforge.net/NS/exist" start="21" max="20">
+  <text><![CDATA[
+            
+                  xquery version "3.1";
+                  declare namespace tei="http://www.tei-c.org/ns/1.0";
+                  let $query := <query xmlns="http://exist.sourceforge.net/NS/exist"><bool><term occur="must">yatra</term><wildcard occur="must">tatra</wildcard></bool></query>
+                  for $hit in //tei:p[ft:query(., $query)]
+                  order by ft:score($hit)
+                  return $hit
+            
+  ]]></text>       
+  </query>
 #+END_SRC
-
-
-

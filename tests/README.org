@@ -5,28 +5,22 @@
 
 #+BEGIN_SRC bash
   #!env /bin/bash
-  EXISTDIR="/opt/lib/existdb-3.0rc1"
-  EXISTCOLLECTION="/db/soup"
-  # files to use, using relative paths
-  EXISTFILE="saritcorpus.xml"
-  EXISTCONFIG="../collection.xconf"
-  $EXISTDIR/bin/client.sh -u admin -P admin --no-gui --rmcol $EXISTCOLLECTION \
-      && \
-      $EXISTDIR/bin/client.sh -u admin -P admin --no-gui --mkcol $EXISTCOLLECTION \
-      && \
-      $EXISTDIR/bin/client.sh -u admin -P admin --no-gui --rmcol "/db/system/config/"$EXISTCOLLECTION \
-      && \
-      $EXISTDIR/bin/client.sh -u admin -P admin --no-gui --mkcol "/db/system/config/"$EXISTCOLLECTION \
-      && \
-      $EXISTDIR/bin/client.sh --collection "/db/system/config/"$EXISTCOLLECTION -u admin -P admin \
-                              --parse $EXISTCONFIG
-      && \
-      $EXISTDIR/bin/client.sh --collection $EXISTCOLLECTION -u admin -P admin \
-                              --parse $EXISTFILE && \
+  EXISTDIR="/opt/lib/existdb-3.0rc1" \
+          EXISTCOLLECTION="/db/soup" \
+          EXISTFILE="saritcorpus.xml" \
+          EXISTCONFIG="../collection.xconf" \
+          EXISTADMINU="admin" \
+          EXSITADMINP="admin" \
+          $EXISTDIR/bin/client.sh -u $EXISTADMINU -P $EXISTADMINP --no-gui --rmcol $EXISTCOLLECTION  && \
+      $EXISTDIR/bin/client.sh -u $EXISTADMINU -P $EXISTADMINP --no-gui --mkcol $EXISTCOLLECTION   && \
+      $EXISTDIR/bin/client.sh -u $EXISTADMINU -P $EXISTADMINP --no-gui --rmcol "/db/system/config/"$EXISTCOLLECTION && \
+      $EXISTDIR/bin/client.sh -u $EXISTADMINU -P $EXISTADMINP --no-gui --mkcol "/db/system/config/"$EXISTCOLLECTION && \
+      $EXISTDIR/bin/client.sh --collection "/db/system/config/"$EXISTCOLLECTION -u $EXISTADMINU -P $EXISTADMINP --parse $EXISTCONFIG && \
+      $EXISTDIR/bin/client.sh --collection $EXISTCOLLECTION -u $EXISTADMINU -P $EXISTADMINP --parse $EXISTFILE 
 
       # on my laptop: parsed 104107439 bytes in 694576ms.
-    
-                            
+  
+                          
 #+END_SRC
 
 
@@ -110,23 +104,22 @@
   POST http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml
   Content-Type: application/xml
 
-  <query xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
+  <query start="1" max="100" xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
   <text>
   <![CDATA[
-          
+    
                     xquery version "3.1";
                     declare namespace tei="http://www.tei-c.org/ns/1.0";
                     let $options := <options>
                             <default-operator>and</default-operator>
-                            <phrase-slop>1</phrase-slop>
+                            <phrase-slop>0</phrase-slop>
                             <leading-wildcard>yes</leading-wildcard>
-                            <filter-rewrite>yes</filter-rewrite>
               </options>            
                     let $query := "*ntar* AND *tatr*"
                     for $hit in //tei:p[ft:query(., $query, $options)]
-                    order by ft:score($hit)
-                    return $hit
-          
+                    order by ft:score($hit) descending
+                    return <result><score>{ft:score($hit)}</score><content>{$hit}</content></result>
+    
     ]]>
     </text>
   </query>

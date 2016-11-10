@@ -39,7 +39,7 @@
       <xdb:remove xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
-		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/sarit-data"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}"
 		 collection="master"		 
 		 />
       
@@ -59,7 +59,7 @@
       <xdb:store xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
-		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/system/config/db/sarit-data"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/system/config/db/${config.dbname}"
 		 createcollection="true"
 		 srcfile="${config.config}"/>
     </target>
@@ -69,7 +69,7 @@
       <xdb:remove xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
-		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/system/config/db/sarit-data"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/system/config/db/${config.dbname}"
 		 resource="collection.xconf"
 		 />
     </target>
@@ -83,14 +83,14 @@
       <xdb:store xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
-		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/sarit-data/master"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}/master"
 		 createcollection="true"
 		 srcfile="${config.saritdata}/${config.index}"/>
       
       <xdb:xquery xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
-		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/sarit-data/master"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}/master"
 		 query="${sarit-find-files}"
 		 outputproperty="storeus"/>
       
@@ -108,7 +108,7 @@
       <xdb:store xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
-		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/sarit-data/master"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}/master"
 		 createcollection="true"
 		 srcfile="${config.saritdata}/${filename}"/>
     </target>

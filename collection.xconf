@@ -3,9 +3,8 @@
     <!-- Disable the old full text index -->
     <fulltext default="none" attributes="false"/>
     <lucene>
-      <!-- <analyzer class="org.apache.lucene.analysis.standard.StandardAnalyzer"> -->
-      <!--     <param name="stopwords" type="org.apache.lucene.analysis.util.CharArraySet"/> -->
-      <!-- </analyzer> -->
+      <analyzer class="org.apache.lucene.analysis.standard.WhitespaceAnalyzer">
+      </analyzer>
       <analyzer class="de.unihd.hra.libs.java.luceneTranscodingAnalyzer.TranscodingAnalyzer">
       </analyzer>
       <text qname="tei:teiHeader"/>

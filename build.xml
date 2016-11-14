@@ -96,9 +96,22 @@
       
       <echo message="Found this stuff to store: ${storeus}"/>
 
-      <foreach list="${storeus}" target="storefile" param="filename" >
-	
-      </foreach>
+      <foreach list="${storeus}" target="storefile" param="filename" />
+
+      <echo message="Storing test suite"/>
+
+      <xdb:store xmlns:xdb="http://exist-db.org/ant"
+		 user="${config.username}"
+		 password="${config.password}"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}/tests"
+		 createcollection="true"
+		 >
+	<fileset dir="${config.saritdata}/../tests"> 
+          <include name="*.xq"/>
+          <include name="*.xql"/>
+	</fileset>
+      </xdb:store>
+      
       
     </target>
 
@@ -111,6 +124,7 @@
 		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}/master"
 		 createcollection="true"
 		 srcfile="${config.saritdata}/${filename}"/>
+      
     </target>
 
 </project>

@@ -5,13 +5,8 @@
     <lucene>
       <analyzer class="de.unihd.hra.libs.java.luceneTranscodingAnalyzer.TranscodingAnalyzer">
       </analyzer>
-      <analyzer class="org.apache.lucene.analysis.standard.WhitespaceAnalyzer">
-      </analyzer>
+      <parser class="org.apache.lucene.queryparser.analyzing.AnalyzingQueryParser"/>
       <text qname="tei:teiHeader"/>
-      <text qname="tei:encodingDesc"/>
-      <text qname="tei:fileDesc"/>
-      <text qname="tei:profileDesc"/>
-      <text qname="tei:revisionDesc"/>
       <text qname="tei:div"/>
       <!--non-empty descendants of div in SARIT files-->
       <text qname="tei:p"/>
@@ -22,11 +17,6 @@
       <text qname="tei:list"/>
       <text qname="tei:l"/>
       <text qname="tei:quote"/>
-      <text qname="tei:table"/>
-      <text qname="tei:listApp"/>
-      <text qname="tei:listBibl"/>
-      <text qname="tei:cit"/>
-      <text qname="tei:label"/>
     </lucene>
   </index>
 </collection>

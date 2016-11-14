@@ -6,7 +6,7 @@
   <password></password>
   <saritdata>data</saritdata>
   <!-- where exist is installed -->
-  <existdir>/opt/lib/existdb-3.0rc1</existdir>
+  <existdir>/home/beta/webstuff/sarit-webapp/exist-things/exist</existdir>
   <index>saritcorpus.xml</index>
   <config>collection.xconf</config>
 </config>

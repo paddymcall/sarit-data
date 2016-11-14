@@ -3,31 +3,23 @@
     <!-- Disable the old full text index -->
     <fulltext default="none" attributes="false"/>
     <lucene>
-      <!-- <analyzer class="org.apache.lucene.analysis.standard.StandardAnalyzer"> -->
-      <!--     <param name="stopwords" type="org.apache.lucene.analysis.util.CharArraySet"/> -->
-      <!-- </analyzer> -->
-      <analyzer class="de.unihd.hra.libs.java.luceneTranscodingAnalyzer.TranscodingAnalyzer">
+      <analyzer id="slp1" class="de.unihd.hra.libs.java.luceneTranscodingAnalyzer.TranscodingAnalyzer">
       </analyzer>
-      <text qname="tei:teiHeader"/>
-      <text qname="tei:encodingDesc"/>
-      <text qname="tei:fileDesc"/>
-      <text qname="tei:profileDesc"/>
-      <text qname="tei:revisionDesc"/>
-      <text qname="tei:div"/>
+      <analyzer id="english" class="org.apache.lucene.analysis.standard.StandardAnalyzer">
+          <param name="stopwords" type="org.apache.lucene.analysis.util.CharArraySet"/>
+      </analyzer>
+      <text qname="tei:teiHeader" analyzer="standard"/>
+      <text qname="tei:div" analyzer="slp1"/>
       <!--non-empty descendants of div in SARIT files-->
-      <text qname="tei:p"/>
-      <text qname="tei:head"/>
-      <text qname="tei:lg"/>
-      <text qname="tei:trailer"/>
-      <text qname="tei:note"/>
-      <text qname="tei:list"/>
-      <text qname="tei:l"/>
-      <text qname="tei:quote"/>
-      <text qname="tei:table"/>
-      <text qname="tei:listApp"/>
-      <text qname="tei:listBibl"/>
-      <text qname="tei:cit"/>
-      <text qname="tei:label"/>
+      <text qname="tei:p" analyzer="slp1"/>
+      <text qname="tei:head" analyzer="slp1"/>
+      <text qname="tei:lg" analyzer="slp1"/>
+      <text qname="tei:trailer" analyzer="slp1"/>
+      <text qname="tei:note" analyzer="slp1"/>
+      <text qname="tei:list" analyzer="slp1"/>
+      <text qname="tei:l" analyzer="slp1"/>
+      <text qname="tei:quote" analyzer="slp1"/>
+      <text qname="tei:table" analyzer="slp1"/>
     </lucene>
   </index>
 </collection>

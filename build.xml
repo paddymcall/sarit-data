@@ -36,6 +36,7 @@
 
 
     <target name="clean" xmlns:xmldb="http://exist-db.org/ant" depends="deconfigure">
+      <echo message="Removing database content at xmldb:exist://localhost:8080/exist/xmlrpc/db/sarit-data"/>
       <xdb:remove xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"

@@ -5,7 +5,6 @@
     <lucene>
       <analyzer class="de.unihd.hra.libs.java.luceneTranscodingAnalyzer.TranscodingAnalyzer">
       </analyzer>
-      <parser class="org.apache.lucene.queryparser.analyzing.AnalyzingQueryParser"/>
       <text qname="tei:teiHeader"/>
       <text qname="tei:div"/>
       <!--non-empty descendants of div in SARIT files-->

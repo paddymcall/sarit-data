@@ -4,12 +4,16 @@ xquery version "3.0";
  : A set of helper functions to access the application context from
  : within a module.
  :)
-module namespace config="http://existsolutions.com/apps/sarit-data/config";
+module namespace config="http://sarit.indology.info/sarit-data/exist/config";
 
 declare namespace templates="http://exist-db.org/xquery/templates";
 
 declare namespace repo="http://exist-db.org/xquery/repo";
 declare namespace expath="http://expath.org/ns/pkg";
+
+
+(: TODO: keep in sync with "index" setting in ../config.xml :)
+declare variable $config:index := "saritcorpus.xml";
 
 declare variable $config:github-root := "https://api.github.com/repos/sarit/SARIT-corpus/";
 

@@ -258,3 +258,71 @@ GET http://localhost:8080/exist/rest/sarit-data/tests/suite.xql
 
 
 
+
+
+** REST --> xpath lookups
+
+- won't work, does not traverse xinclude directives like this
+
+#+BEGIN_SRC restclient
+  POST http://localhost:8080/exist/rest/sarit-data/master/saritcorpus.xml
+  Content-Type: application/xml
+
+  <query xmlns="http://exist.sourceforge.net/NS/exist" start="1" max="200">
+  <text><![CDATA[
+        
+  xquery version "3.1";
+
+  declare default element namespace "http://www.tei-c.org/ns/1.0";
+
+  let $doc := request:get-path-info()
+
+  (: let $fullpath := request:get-effective-uri() :)
+
+  return doc($doc)/teiCorpus/*[2]//p
+        
+  ]]></text>
+  </query>
+#+END_SRC
+
+
+*** trying with basex for comparison
+
+#+BEGIN_SRC restclient
+  # set a var for this
+  :my-auth := (base64-encode-string "admin:admin")
+
+  POST http://localhost:8984/rest/saritdata/saritcorpus.xml
+  Authorization: Basic :my-auth
+  Content-Type: application/xml
+
+
+    <query xmlns="http://basex.org/rest">
+    <text><![CDATA[
+      
+    declare default element namespace "http://www.tei-c.org/ns/1.0";
+
+    (: let $fullpath := request:get-effective-uri() :)
+
+    /teiCorpus//text[@xml:id="TaVā"]/body[1]/div[2]/div[1]/div[11]/div[1]/lg[1]
+      
+    ]]></text>
+    </query>
+
+
+#+END_SRC
+
+looks good:
+
+#+BEGIN_SRC nxml
+<lg xmlns="http://www.tei-c.org/ns/1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <l>एकखण्डेन शब्देन विशिष्टो यत्र गम्यते ।</l>
+  <l>विशेषणस्य वाच्यत्वं तत्र सर्वत्र जायते ॥ ३६ ॥</l>
+</lg>
+<!-- POST http://localhost:8984/rest/saritdata/saritcorpus.xml -->
+<!-- HTTP/1.1 200 OK -->
+<!-- Content-Type: application/xml; charset=UTF-8 -->
+<!-- Content-Length: 337 -->
+<!-- Server: Jetty(8.1.18.v20150929) -->
+<!-- Request duration: 0.016114s -->
+#+END_SRC

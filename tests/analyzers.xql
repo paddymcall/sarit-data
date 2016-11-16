@@ -28,7 +28,8 @@ declare variable $analyze:XCONF2 :=
     <collection xmlns="http://exist-db.org/collection-config/1.0">
         <index xmlns:xs="http://www.w3.org/2001/XMLSchema">
         <lucene>
-                <analyzer class="org.apache.lucene.analysis.core.WhitespaceAnalyzer"/>
+        <analyzer class="org.apache.lucene.analysis.core.WhitespaceAnalyzer"/>
+	<parser class="org.apache.lucene.analysis.core.WhitespaceAnalyzer"/>
                 <text qname="p"/>
             </lucene>
         </index>

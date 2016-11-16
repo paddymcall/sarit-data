@@ -1,18 +1,27 @@
 xquery version "3.0";
 
-(: from lucene tests :)
+(: 
+
+Test wildcard queries in combination with case sensitive indices, and
+whether the addition of a new option
+<lowercase-expanded>yes|no</lowercase-expanded> (default: yes), works
+as expected.
+
+
+
+ :)
 
 module namespace analyze="http://exist-db.org/xquery/lucene/test/analyzers";
 
 declare namespace test="http://exist-db.org/xquery/xqsuite";
 
-(: the sarit-slp1 analyzer developed by claudius :)
+(: the standard analyzer, should be case insensitive :)
 declare variable $analyze:XCONF1 :=
     <collection xmlns="http://exist-db.org/collection-config/1.0">
         <index xmlns:xs="http://www.w3.org/2001/XMLSchema">
         <lucene>
         <analyzer class="org.apache.lucene.analysis.core.StandardAnalyzer"/>
-	<!-- parser makes no difference -->
+	<!-- parser makes no difference? -->
         <!-- <parser class="org.apache.lucene.analysis.core.StandardAnalyzer"/> -->
         <text qname="p"/>
         </lucene>
@@ -23,13 +32,14 @@ declare variable $analyze:XCONF1 :=
     </collection>;
 
 
-(: simple dumb whitespace analyzer, for sake of comparison :)
+(: simple whitespace analyzer, should be case sensitive :)
 declare variable $analyze:XCONF2 :=
     <collection xmlns="http://exist-db.org/collection-config/1.0">
         <index xmlns:xs="http://www.w3.org/2001/XMLSchema">
         <lucene>
         <analyzer class="org.apache.lucene.analysis.core.WhitespaceAnalyzer"/>
-	<parser class="org.apache.lucene.analysis.core.WhitespaceAnalyzer"/>
+	<!-- parser makes no difference? -->
+        <!-- <parser class="org.apache.lucene.analysis.core.WhitespaceAnalyzer"/> -->
                 <text qname="p"/>
             </lucene>
         </index>
@@ -53,7 +63,6 @@ function analyze:setup() {
 	<p id="upper">AAAAABBBBBCCCCC</p>
 	<p id="lower">aaaaabbbbbccccc</p>
 	<p id="mixed">aaaAAbbbBBcccCC</p>
-	<p>Eins zwei drei vier zwei fünf sechs.</p>
 	</test>
     return (
         xmldb:store($confCol1, "collection.xconf", $analyze:XCONF1),
@@ -79,8 +88,19 @@ declare
 %test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>", "<p id='lower'>aaaaabbbbbccccc</p>", "<p id='mixed'>aaaAAbbbBBcccCC</p>")
     %test:args("AAaaA*")
     %test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>", "<p id='lower'>aaaaabbbbbccccc</p>", "<p id='mixed'>aaaAAbbbBBcccCC</p>")
-function analyze:case-insensitive-default($term as xs:string) {
-	collection("/db/lucenetest/test1")//p[ft:query(., $term)]
+function analyze:case-insensitive-wildcard-default($querystring as xs:string) {
+	collection("/db/lucenetest/test1")//p[ft:query(., $querystring)]
+};
+
+declare 
+    %test:args("AAAAABBBBBCCCCC")
+    %test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>", "<p id='lower'>aaaaabbbbbccccc</p>", "<p id='mixed'>aaaAAbbbBBcccCC</p>")
+    %test:args("AAAAABBBBBCCCCC")
+%test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>", "<p id='lower'>aaaaabbbbbccccc</p>", "<p id='mixed'>aaaAAbbbBBcccCC</p>")
+    %test:args("AAAAABBBBBCCCCC")
+    %test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>", "<p id='lower'>aaaaabbbbbccccc</p>", "<p id='mixed'>aaaAAbbbBBcccCC</p>")
+function analyze:case-insensitive-term-default($querystring as xs:string) {
+	collection("/db/lucenetest/test1")//p[ft:query(., $querystring)]
 };
 
 
@@ -91,46 +111,68 @@ declare
 %test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>", "<p id='lower'>aaaaabbbbbccccc</p>", "<p id='mixed'>aaaAAbbbBBcccCC</p>")
     %test:args("AAaaA*")
     %test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>", "<p id='lower'>aaaaabbbbbccccc</p>", "<p id='mixed'>aaaAAbbbBBcccCC</p>")
-function analyze:case-insensitive-filter-rewrite-no($term as xs:string) {
+function analyze:case-insensitive-wildcard-filter-rewrite-no($querystring as xs:string) {
 	let $options := <options>
         <filter-rewrite>no</filter-rewrite>
         </options>
-	return collection("/db/lucenetest/test1")//p[ft:query(., $term, $options)]
+	return collection("/db/lucenetest/test1")//p[ft:query(., $querystring, $options)]
 };
 
 
 
 declare 
     %test:args("AAAA*")
-%test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>", "<p id='lower'>aaaaabbbbbccccc</p>", "<p id='mixed'>aaaAAbbbBBcccCC</p>")
+    %test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>", "<p id='lower'>aaaaabbbbbccccc</p>", "<p id='mixed'>aaaAAbbbBBcccCC</p>")
     %test:args("aaaa*")
-%test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>", "<p id='lower'>aaaaabbbbbccccc</p>", "<p id='mixed'>aaaAAbbbBBcccCC</p>")
+    %test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>", "<p id='lower'>aaaaabbbbbccccc</p>", "<p id='mixed'>aaaAAbbbBBcccCC</p>")
     %test:args("AAaaA*")
     %test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>", "<p id='lower'>aaaaabbbbbccccc</p>", "<p id='mixed'>aaaAAbbbBBcccCC</p>")
-function analyze:case-insensitive-filter-rewrite-yes($term as xs:string) {
+function analyze:case-insensitive-filter-rewrite-yes($querystring as xs:string) {
 	let $options := <options>
         <filter-rewrite>yes</filter-rewrite>
         </options>
-	return collection("/db/lucenetest/test1")//p[ft:query(., $term, $options)]
+	return collection("/db/lucenetest/test1")//p[ft:query(., $querystring, $options)]
 };
 
 
+
 declare 
-    %test:args("AAAA*")
-    %test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>")
     %test:args("AAAAABBBBBCCCCC")
     %test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>")
-    %test:args("aaaa*")
+    %test:args("aaaaabbbbbccccc")
     %test:assertEquals("<p id='lower'>aaaaabbbbbccccc</p>")
-    %test:args("aaaAA*")
-    %test:assertEquals("<p id='mixed'>aaaAAbbbBBcccCC</p>")
     %test:args("aaaAAbbbBBcccCC")
     %test:assertEquals("<p id='mixed'>aaaAAbbbBBcccCC</p>")
-function analyze:case-sensitive-default($term as xs:string) {
-	collection("/db/lucenetest/test2")//p[ft:query(., $term)]
+function analyze:case-sensitive-term-default($querystring as xs:string) {
+	collection("/db/lucenetest/test2")//p[ft:query(., $querystring)]
 };
 
 
+(: 
+
+all wildcard queries with non-lowercase letters should collapse to
+match on lowercase string: the query is lowercased, but the index is
+mixed case
+
+ :)
+declare 
+    %test:args("AAAA*")
+    %test:assertEquals("<p id='lower'>aaaaabbbbbccccc</p>")
+    %test:args("aaaa*")
+    %test:assertEquals("<p id='lower'>aaaaabbbbbccccc</p>")
+    %test:args("aaaAA*")
+    %test:assertEquals("<p id='lower'>aaaaabbbbbccccc</p>")
+function analyze:case-sensitive-wildcard-default($querystring as xs:string) {
+	collection("/db/lucenetest/test2")//p[ft:query(., $querystring)]
+};
+
+(: 
+
+adding new option lowercase-expanded turns off
+setLowercaseExpandedTerms, which enables case sensitive matching for
+wildcards
+
+ :)
 declare 
     %test:args("AAAA*")
     %test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>")
@@ -138,25 +180,28 @@ declare
     %test:assertEquals("<p id='lower'>aaaaabbbbbccccc</p>")
     %test:args("aaaAA*")
     %test:assertEquals("<p id='mixed'>aaaAAbbbBBcccCC</p>")
-function analyze:case-sensitive-filter-rewrite-no($term as xs:string) {
+function analyze:case-sensitive-wildcard-lowercase-expanded-no($querystring as xs:string) {
 	let $options := <options>
-        <filter-rewrite>no</filter-rewrite>
+	<lowercase-expanded>no</lowercase-expanded>
         </options>
-	return collection("/db/lucenetest/test2")//p[ft:query(., $term, $options)]
+	return collection("/db/lucenetest/test2")//p[ft:query(., $querystring, $options)]
 };
-
 
 
 declare 
-    %test:args("AAAA*")
+    %test:args("*BB?B*")
     %test:assertEquals("<p id='upper'>AAAAABBBBBCCCCC</p>")
-    %test:args("aaaa*")
+    %test:args("*bb?b*")
     %test:assertEquals("<p id='lower'>aaaaabbbbbccccc</p>")
-    %test:args("aaaAA*")
+    %test:args("?aaAAbb*")
     %test:assertEquals("<p id='mixed'>aaaAAbbbBBcccCC</p>")
-function analyze:case-sensitive-filter-rewrite-yes($term as xs:string) {
+function analyze:case-sensitive-leading-wildcard-lowercase-expanded-no($querystring as xs:string) {
 	let $options := <options>
-        <filter-rewrite>yes</filter-rewrite>
+	<leading-wildcard>yes</leading-wildcard>
+	<lowercase-expanded>no</lowercase-expanded>
         </options>
-	return collection("/db/lucenetest/test2")//p[ft:query(., $term, $options)]
+	return collection("/db/lucenetest/test2")//p[ft:query(., $querystring, $options)]
 };
+
+
+

@@ -1,0 +1,7 @@
+declare default element namespace "http://www.tei-c.org/ns/1.0";
+declare namespace xi="http://www.w3.org/2001/XInclude";
+declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+declare namespace saxon="http://saxon.sf.net/";
+declare option saxon:output "omit-xml-declaration=yes";
+declare option output:omit-xml-declaration "yes";
+//xi:include[@href]/@href/string()

@@ -1,0 +1,26 @@
+xquery version "3.0";
+
+
+import module namespace request="http://exist-db.org/xquery/request";
+import module namespace util="http://exist-db.org/xquery/util";
+import module namespace config="http://sarit.indology.info/sarit-data/exist/config" at "../config.xml";
+
+
+
+declare function local:main() as node()?
+{
+	let $corpus := config:
+	let $revision :=
+	if (request:get-parameter("revision", ()))
+	then request:get-parameter("revision", ())
+	else "master"
+	let $path :=
+	if (request:get-parameter("path",()))
+	then request:get-parameter("path",())
+	else "/"
+
+	return <identifier><revision>{$revision}</revision><path>{$path}</path></identifier>
+	};
+
+
+<result>{ local:main() }</result>

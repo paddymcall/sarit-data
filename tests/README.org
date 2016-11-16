@@ -101,7 +101,7 @@
 - http://www.exist-db.org/exist/apps/doc/lucene.xml#D2.2.5.10 for options
 
 #+BEGIN_SRC restclient
-  POST http://kjc-sv008.kjc.uni-heidelberg.de:8080/exist/rest/apps/sarit-data/data/avayavinirakarana.xml
+  POST http://localhost:8080/exist/rest/sarit-data/master/
   Content-Type: application/xml
 
   <query start="1" max="100" xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
@@ -111,11 +111,10 @@
                     xquery version "3.1";
                     declare namespace tei="http://www.tei-c.org/ns/1.0";
                     let $options := <options>
-                            <default-operator>and</default-operator>
-                            <phrase-slop>0</phrase-slop>
                             <leading-wildcard>yes</leading-wildcard>
-              </options>            
-                    let $query := "*tāvā*"
+                            <lowercase-expanded>no</lowercase-expanded>
+                            </options>            
+                    let $query := "*tatrABAvA*"
                     for $hit in //tei:p[ft:query(., $query, $options)]
                     let $expanded := util:expand($hit, "expand-xincludes=no")
                     order by ft:score($hit) descending

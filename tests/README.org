@@ -113,8 +113,9 @@
                     let $options := <options>
                             <leading-wildcard>yes</leading-wildcard>
                             <lowercase-expanded>no</lowercase-expanded>
+                            <filter-rewrite>yes</filter-rewrite>
                             </options>            
-                    let $query := "*tatrABAvA*"
+                    let $query := "*tatrABAv*"
                     for $hit in //tei:p[ft:query(., $query, $options)]
                     let $expanded := util:expand($hit, "expand-xincludes=no")
                     order by ft:score($hit) descending
@@ -132,7 +133,6 @@
 
 ** full text wildcard + diacritics
 
-- no results here :-(
 - <2016-11-16 Wed>: works with added lowercase-expanded option, added
   https://github.com/paddymcall/exist/commit/9cb23b73894623a8ac779eb98c1de97bf83c5a45
 

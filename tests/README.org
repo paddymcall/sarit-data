@@ -105,9 +105,7 @@
   Content-Type: application/xml
 
   <query start="1" max="100" xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
-  <text>
-  <![CDATA[
-
+  <text><![CDATA[
                     xquery version "3.1";
                     declare namespace tei="http://www.tei-c.org/ns/1.0";
                     let $options := <options>
@@ -124,7 +122,6 @@
                            <highlighted>{$expanded}</highlighted>
                            <content>{$hit}</content>
                            </result>
-
     ]]>
     </text>
   </query>
@@ -141,9 +138,7 @@
   Content-Type: application/xml
 
   <query  start="1" max="100" xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
-  <text>
-  <![CDATA[
-
+  <text><![CDATA[
                     xquery version "3.1";
                     declare namespace tei="http://www.tei-c.org/ns/1.0";
                     let $options := <options>
@@ -178,12 +173,10 @@
 
   <query xmlns="http://exist.sourceforge.net/NS/exist">
   <text><![CDATA[
-                
                   xquery version "3.1";
                   declare namespace tei="http://www.tei-c.org/ns/1.0";
                   let $query := <query xmlns="http://exist.sourceforge.net/NS/exist"><bool><wildcard>*atr*</wildcard></bool></query>
                   return count(//tei:p[ft:query(., $query)])
-                
   ]]></text>       
   </query>
 #+END_SRC

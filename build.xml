@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- see http://www.exist-db.org/exist/apps/doc/ant-tasks.xml -->
-<project default="store" name="sarit-data">
+<project default="xar"
+	 name="sarit-data"
+	 xmlns:git="antlib:com.rimerosolutions.ant.git">
 
   
   <!-- use ant-contrib for foreach -->
@@ -9,8 +11,8 @@
       <pathelement location="lib/ant-contrib-1.0b3.jar"/>
     </classpath>
   </taskdef>
-  
-    <property name="project.version" value="0.0.1"/>
+	
+    <property name="project.version" value="0.0.3"/>
     <property name="project.app" value="sarit-data"/>
     <property name="build.dir" value="build"/>
 
@@ -29,7 +31,31 @@
       <pathelement path="${server.dir}/exist-optional.jar"/>
     </path>
 
+    <!-- an attempt to get git revision here: http://stackoverflow.com/questions/2974106/how-to-lookup-the-latest-git-commit-hash-from-an-ant-build-script -->
+    <available file="data/.git" type="dir" property="git.present"/>
 
+    <target name="git.revision" description="Store git revision in ${repository.version}" if="git.present">
+      <exec executable="git" outputproperty="git.revision" failifexecutionfails="false" errorproperty="">
+        <arg value="describe"/>
+        <arg value="--tags"/>
+        <arg value="--always"/>
+        <arg value="HEAD"/>
+      </exec>
+      <condition property="repository.version" value="${git.revision}" else="unknown">
+        <and>
+          <isset property="git.revision"/>
+          <length string="${git.revision}" trim="yes" length="0" when="greater"/>
+        </and>
+      </condition>
+    </target>
+
+    
+    <target name="xar">
+        <mkdir dir="${build.dir}"/>
+
+        <zip basedir="." encoding="UTF-8" destfile="${build.dir}/${project.app}-${project.version}.xar" excludes="${build.dir}/*"/>
+    </target>
+    
     <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
       <classpath refid="classpath.core"/>
     </typedef>
@@ -42,11 +68,11 @@
 		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}"
 		 collection="master"		 
 		 />
-      
     </target>
 
     <target name="config-file-present">
-      <description>Check if config file (${config.config}) exists.</description>
+      <description>Check if config file (${config.config})
+      exists.</description>
       <available file="${config.config}" property="config-file.present"/>
     </target>
 
@@ -83,14 +109,14 @@
       <xdb:store xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
-		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}/master"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}"
 		 createcollection="true"
 		 srcfile="${config.saritdata}/${config.index}"/>
       
       <xdb:xquery xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
-		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}/master"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}"
 		 query="${sarit-find-files}"
 		 outputproperty="storeus"/>
       
@@ -121,7 +147,7 @@
       <xdb:store xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
-		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}/master"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}"
 		 createcollection="true"
 		 srcfile="${config.saritdata}/${filename}"/>
       

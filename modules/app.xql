@@ -3,7 +3,7 @@ xquery version "3.0";
 module namespace app="http://existsolutions.com/apps/sarit-data/templates";
 
 import module namespace templates="http://exist-db.org/xquery/templates" ;
-import module namespace config="http://existsolutions.com/apps/sarit-data/config" at "config.xqm";
+import module namespace config="http://sarit.indology.info/sarit-data/exist/config" at "config.xqm";
 
 (:~
  : This is a sample templating function. It will be called by the templating module if

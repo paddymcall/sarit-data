@@ -11,7 +11,7 @@ import module namespace templates="http://exist-db.org/xquery/templates" ;
  : The following modules provide functions which will be called by the 
  : templating.
  :)
-import module namespace config="http://existsolutions.com/apps/sarit-data/config" at "config.xqm";
+import module namespace config="http://sarit.indology.info/sarit-data/exist/config" at "config.xqm";
 import module namespace app="http://existsolutions.com/apps/sarit-data/templates" at "app.xql";
 import module namespace gh="http://exist-db.org/apps/sarit/github-update" at "update.xql";
 

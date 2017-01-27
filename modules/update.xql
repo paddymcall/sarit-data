@@ -11,7 +11,7 @@ declare namespace xi="http://www.w3.org/2001/XInclude";
 
 import module namespace http="http://expath.org/ns/http-client";
 import module namespace templates="http://exist-db.org/xquery/templates";
-import module namespace config="http://existsolutions.com/apps/sarit-data/config" at "config.xqm";
+import module namespace config="http://sarit.indology.info/sarit-data/exist/config" at "config.xqm";
 import module namespace console="http://exist-db.org/xquery/console" at "java:org.exist.console.xquery.ConsoleModule";
 
 declare function gh:get-corpus() as xs:string* {

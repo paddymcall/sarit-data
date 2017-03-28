@@ -11,7 +11,7 @@
     </classpath>
   </taskdef>
 	
-    <property name="project.version" value="0.0.3"/>
+    <property name="project.version" value="0.0.2"/>
     <property name="project.app" value="sarit-data"/>
     <property name="build.dir" value="build"/>
 
@@ -32,8 +32,12 @@
 
     <target name="xar">
         <mkdir dir="${build.dir}"/>
-
-        <zip basedir="." encoding="UTF-8" destfile="${build.dir}/${project.app}-${project.version}.xar" excludes="${build.dir}/*"/>
+        <zip destfile="${build.dir}/${project.app}-${project.version}.xar"
+	     encoding="UTF-8"
+	     update="no">
+	  <zipfileset dir="." excludes="${build.dir}/"/>
+	  <zipfileset dir="data/" excludes="data/transliterated/"/>
+	</zip>
     </target>
     
     <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
@@ -41,13 +45,12 @@
     </typedef>
 
 
-    <target name="clean" xmlns:xmldb="http://exist-db.org/ant" depends="deconfigure">
+    <target name="clean" xmlns:xmldb="http://exist-db.org/ant">
       <xdb:remove xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
 		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}"
-		 collection="master"		 
-		 />
+		 collection="master" />
     </target>
 
     <target name="config-file-present">
@@ -76,8 +79,7 @@
 		 user="${config.username}"
 		 password="${config.password}"
 		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/system/config/db/${config.dbname}"
-		 resource="collection.xconf"
-		 />
+		 resource="collection.xconf" />
     </target>
     
     <target name="store"
@@ -86,6 +88,7 @@
       <echo message="Installing SARIT data"/>
       <echo message="Loading SARIT sources from directory: ${config.saritdata}"/>
       <echo message="Storing SARIT index from: ${config.saritdata}/${config.index}"/>
+
       <xdb:store xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"

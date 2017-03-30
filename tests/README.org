@@ -32,7 +32,7 @@
 ** see if rest api is alive
 
  #+BEGIN_SRC restclient
-   GET http://localhost:8080/exist/rest/
+   GET http://admin:@localhost:8080/exist/rest/
    User-Agent: Emacs Restclient
  #+END_SRC
 
@@ -40,29 +40,33 @@
 ** get a file 
 
 #+BEGIN_SRC restclient
-  GET http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml
+  GET http://admin:@localhost:8080/exist/rest/sarit-data/HEAD/avayavinirakarana.xml
 #+END_SRC
 
 
 ** get the config
 
 #+BEGIN_SRC restclient
-  GET http://localhost:8080/exist/rest/db/system/config/db/sarit-data/collection.xconf
+  GET http://admin:@localhost:8080/exist/rest/db/system/config/db/sarit-data/collection.xconf
 #+END_SRC
 
 
 
-** simple search (not working, namespace issue?)
+** simple search (namespace issue)
 
 #+BEGIN_SRC restclient
-  GET http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml?_query=//p
+  GET http://admin:@localhost:8080/exist/rest/sarit-data/HEAD/avayavinirakarana.xml?_query=//p
+
+
+  # easier
+  GET http://admin:@localhost:8080/exist/rest/sarit-data/HEAD/avayavinirakarana.xml?_query=//*[matches(local-name(), '^body')]//*[matches(local-name(), '^p$')]
 #+END_SRC
 
 
-** full text query (standard index)
+** full text query
 
 #+BEGIN_SRC restclient
-  POST http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml
+  POST http://admin:@localhost:8080/exist/rest/sarit-data/HEAD/avayavinirakarana.xml
   Content-Type: application/xml
 
   <query xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
@@ -71,10 +75,10 @@
 #+END_SRC
 
 
-** full text query for slp1 index
+** full text query (2): if slp1 index is set up correctly, should have the same results as above
 
 #+BEGIN_SRC restclient
-  POST http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml
+  POST http://admin:@localhost:8080/exist/rest/sarit-data/HEAD
   Content-Type: application/xml
 
   <query xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
@@ -87,7 +91,7 @@
 - see http://www.exist-db.org/exist/apps/doc/lucene.xml#D2.2.5
 
 #+BEGIN_SRC restclient
-  POST http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml
+  POST http://admin:@localhost:8080/exist/rest/sarit-data/HEAD/avayavinirakarana.xml
   Content-Type: application/xml
 
   <query xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
@@ -101,7 +105,7 @@
 - http://www.exist-db.org/exist/apps/doc/lucene.xml#D2.2.5.10 for options
 
 #+BEGIN_SRC restclient
-  POST http://localhost:8080/exist/rest/sarit-data/master/
+  POST http://admin:@localhost:8080/exist/rest/sarit-data/HEAD/
   Content-Type: application/xml
 
   <query start="1" max="100" xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
@@ -132,9 +136,10 @@
 
 - <2016-11-16 Wed>: works with added lowercase-expanded option, added
   https://github.com/paddymcall/exist/commit/9cb23b73894623a8ac779eb98c1de97bf83c5a45
+- and also with https://github.com/eXist-db/exist/pull/1341
 
 #+BEGIN_SRC restclient
-  POST http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml
+  POST http://admin:@localhost:8080/exist/rest/sarit-data/HEAD/avayavinirakarana.xml
   Content-Type: application/xml
 
   <query  start="1" max="100" xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
@@ -142,11 +147,60 @@
                     xquery version "3.1";
                     declare namespace tei="http://www.tei-c.org/ns/1.0";
                     let $options := <options>
-                    <lowercase-expanded>no</lowercase-expanded>
+                    <lowercase-expanded-terms>no</lowercase-expanded-terms>
                     <leading-wildcard>yes</leading-wildcard>
-                    <filter-rewrite>yes</filter-rewrite>
                     </options>            
                     let $query := "*astvA* AND sTUl*"
+                    for $hit in //tei:p[ft:query(., $query, $options)]
+                    order by ft:score($hit) descending
+                    return
+                           <result>
+                           <score>{ft:score($hit)}</score>
+                           <highlighted>{util:expand($hit, "expand-xincludes='no'")}</highlighted>
+                           <content>{$hit}</content>
+                           </result>
+    ]]>
+    </text>
+  </query>
+
+  # OR in IAST (not working?)
+  POST http://admin:@localhost:8080/exist/rest/sarit-data/HEAD/avayavinirakarana.xml
+  Content-Type: application/xml
+
+  <query  start="1" max="100" xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
+  <text><![CDATA[
+                    xquery version "3.1";
+                    declare namespace tei="http://www.tei-c.org/ns/1.0";
+                    let $options := <options>
+                    <lowercase-expanded-terms>no</lowercase-expanded-terms>
+                    <leading-wildcard>yes</leading-wildcard>
+                    </options>            
+                    let $query := "*astvā* AND sthūl*"
+                    for $hit in //tei:p[ft:query(., $query, $options)]
+                    order by ft:score($hit) descending
+                    return
+                           <result>
+                           <score>{ft:score($hit)}</score>
+                           <highlighted>{util:expand($hit, "expand-xincludes='no'")}</highlighted>
+                           <content>{$hit}</content>
+                           </result>
+    ]]>
+    </text>
+  </query>
+
+  # OR in Devanāgarī (not working?)
+  POST http://admin:@localhost:8080/exist/rest/sarit-data/HEAD/avayavinirakarana.xml
+  Content-Type: application/xml
+
+  <query  start="1" max="100" xmlns="http://exist.sourceforge.net/NS/exist" xmlns:tei="http://www.tei-c.org/ns/1.0">
+  <text><![CDATA[
+                    xquery version "3.1";
+                    declare namespace tei="http://www.tei-c.org/ns/1.0";
+                    let $options := <options>
+                    <lowercase-expanded-terms>no</lowercase-expanded-terms>
+                    <leading-wildcard>yes</leading-wildcard>
+                    </options>            
+                    let $query := "*अस्त्वा* AND स्थूल्*"
                     for $hit in //tei:p[ft:query(., $query, $options)]
                     order by ft:score($hit) descending
                     return
@@ -168,7 +222,7 @@
   complicated because it requires that user input is parsed).
 
 #+BEGIN_SRC restclient
-  POST http://localhost:8080/exist/rest/sarit-data/master/avayavinirakarana.xml
+  POST http://admin:@localhost:8080/exist/rest/sarit-data/HEAD/avayavinirakarana.xml
   Content-Type: application/xml
 
   <query xmlns="http://exist.sourceforge.net/NS/exist">
@@ -213,8 +267,8 @@
 
   <query xmlns="http://exist.sourceforge.net/NS/exist" start="1" max="20">
   <text><![CDATA[
-        
-      
+
+
             xquery version "3.1";
 
             import module namespace sarit-slp1 = "http://hra.uni-heidelberg.de/ns/sarit-transliteration";
@@ -228,7 +282,7 @@
             sarit-slp1:transcode("bh?va"),
 
             sarit-slp1:transcode("bh?va* AND (paramā* OR prame*)")
-        
+
     ]]></text>       
   </query>
 #+END_SRC
@@ -263,7 +317,7 @@ GET http://localhost:8080/exist/rest/sarit-data/tests/suite.xql
 - won't work, does not traverse xinclude directives like this
 
 #+BEGIN_SRC restclient
-  POST http://localhost:8080/exist/rest/sarit-data/master/saritcorpus.xml
+  POST http://admin:@localhost:8080/exist/rest/sarit-data/HEAD/saritcorpus.xml
   Content-Type: application/xml
 
   <query xmlns="http://exist.sourceforge.net/NS/exist" start="1" max="200">

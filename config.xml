@@ -5,8 +5,8 @@
   <username>admin</username>
   <password></password>
   <saritdata>data</saritdata>
-  <!-- where exist is installed -->
-  <existdir>/home/beta/webstuff/sarit-webapp/exist-things/exist</existdir>
+  <!-- where exist is installed: TODO override -->
+  <existdir>../exist</existdir>
   <index>saritcorpus.xml</index>
   <config>collection.xconf</config>
 </config>

@@ -4,9 +4,13 @@
   <dbname>sarit-data</dbname>
   <username>admin</username>
   <password></password>
+  <!-- path to sarit corpus -->
   <saritdata>data</saritdata>
+  <!-- revision you want to save: override in command line args -->
+  <revision>HEAD</revision>
   <!-- where exist is installed: TODO override -->
   <existdir>../exist</existdir>
+  <!-- name of the index file -->
   <index>saritcorpus.xml</index>
   <config>collection.xconf</config>
 </config>

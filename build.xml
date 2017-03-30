@@ -53,6 +53,14 @@
 		 collection="${config.dbname}" />
     </target>
 
+    <target name="clean-revision" xmlns:xmldb="http://exist-db.org/ant">
+      <xdb:remove xmlns:xdb="http://exist-db.org/ant"
+		 user="${config.username}"
+		 password="${config.password}"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}"
+		 collection="${config.revision}" />
+    </target>
+
     <target name="config-file-present">
       <description>Check if config file (${config.config})
       exists.</description>
@@ -88,18 +96,21 @@
       <echo message="Installing SARIT data"/>
       <echo message="Loading SARIT sources from directory: ${config.saritdata}"/>
       <echo message="Storing SARIT index from: ${config.saritdata}/${config.index}"/>
+      <echo message="Storing SARIT revision: ${config.revision}"/>
 
+      <!-- store the index file first -->
       <xdb:store xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
-		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}/${config.revision}"
 		 createcollection="true"
 		 srcfile="${config.saritdata}/${config.index}"/>
-      
+
+      <!-- find the documents mentioned in the index file -->
       <xdb:xquery xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
-		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}/${config.revision}"
 		 query="${sarit-find-files}"
 		 outputproperty="storeus"/>
       
@@ -112,7 +123,7 @@
       <xdb:store xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
-		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}/tests"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}/${config.revision}/tests"
 		 createcollection="true"
 		 >
 	<fileset dir="./tests"> 
@@ -130,7 +141,7 @@
       <xdb:store xmlns:xdb="http://exist-db.org/ant"
 		 user="${config.username}"
 		 password="${config.password}"
-		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}"
+		 uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/${config.dbname}/${config.revision}"
 		 createcollection="true"
 		 srcfile="${config.saritdata}/${filename}"/>
       

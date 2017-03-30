@@ -114,7 +114,7 @@
                     declare namespace tei="http://www.tei-c.org/ns/1.0";
                     let $options := <options>
                             <leading-wildcard>yes</leading-wildcard>
-                            <lowercase-expanded>no</lowercase-expanded>
+                            <lowercase-expanded-terms>no</lowercase-expanded-terms>
                             <filter-rewrite>yes</filter-rewrite>
                             </options>            
                     let $query := "*tatrABAv*"
